@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace MPAConnector
 
                 Console.ReadLine();
 
-                await x.Disconnect();
+                x.Disconnect();
             }
         }
 
@@ -38,7 +39,7 @@ namespace MPAConnector
                 mpaRgbButton.PressedChanged += MpaRgbButton_PressedChanged;
             }
 
-            var encoder = e.Chain.SelectMany(c => c).OfType<IMPAEncoder>().Take(5).ToList();
+            var encoder = e.Chain.SelectMany(c => c).OfType<IMPAEncoder>().Take(6).ToList();
             var fader = e.Chain.SelectMany(c => c).OfType<IMPAMotorfader>().ToList();
 
             for (int i = 0; i < 4; i++)
@@ -71,7 +72,16 @@ namespace MPAConnector
                 };
             }
 
-            var last = encoder.Last();
+            bool wave = true;
+
+            var reallylast = encoder.Last();
+            reallylast.PressedChanged += (s, a) =>
+            {
+                if (!reallylast.Pressed)
+                    wave = !wave;
+            };
+
+            var last = encoder.ElementAt(4);
             var flag = false;
             last.PressedChanged += async (s, a) =>
             {
@@ -91,7 +101,10 @@ namespace MPAConnector
                         {
                             if (!flag) break;
 
-                            var w = (winkel / 180 * Math.PI) + (Math.PI / 2) * mpaMotorfader.Index;
+                            var w = (winkel / 180 * Math.PI);
+                            if (wave)
+                                w += (Math.PI / 2) * mpaMotorfader.Index;
+
                             var x = Math.Sin(w);
 
                             mpaMotorfader.Value = (ushort)((x + 1) * ushort.MaxValue * 0.5);
@@ -106,9 +119,6 @@ namespace MPAConnector
         {
             IMPARgbButton b = sender as IMPARgbButton;
             if (b == null) return;
-
-            Console.WriteLine("Button {0} pressed {1}", b.Index, b.Pressed);
-            return;
 
             if (b.Index < 7)
             {

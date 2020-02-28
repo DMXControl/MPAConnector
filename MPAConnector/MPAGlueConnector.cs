@@ -32,7 +32,7 @@ namespace MPAConnector
 
         public async Task connect()
         {
-            await Disconnect();
+            Disconnect();
 
             client = new TcpClient();
             await client.ConnectAsync(RemoteHost, RemotePort).ConfigureAwait(false);
@@ -43,15 +43,10 @@ namespace MPAConnector
             SendShit();
         }
 
-        public async Task Disconnect()
+        public void Disconnect()
         {
-            if (_sendQueue != null)
-            {
-                _sendQueue.CompleteAdding();
-                while (!_sendQueue.IsCompleted)
-                    await Task.Delay(10);
-                _sendQueue = null;
-            }
+            _sendQueue?.CompleteAdding();
+            _sendQueue = null;
 
             client?.Close();
             client = null;
@@ -65,12 +60,12 @@ namespace MPAConnector
                 {
                     var n = client.GetStream();
                     byte[] sizeBytes = new byte[2];
-                    await n.ReadAsync(sizeBytes, 0, 2);
+                    await n.ReadAsync(sizeBytes, 0, 2).ConfigureAwait(false);
 
                     int size = sizeBytes[0] | (sizeBytes[1] << 8);
 
                     byte[] payload = new byte[size];
-                    await n.ReadAsync(payload, 0, size);
+                    await n.ReadAsync(payload, 0, size).ConfigureAwait(false);
 
                     ParsePayload(payload);
                 }
@@ -83,20 +78,20 @@ namespace MPAConnector
             try
             {
                 await Task.Yield();
-                foreach (var e in _sendQueue.GetConsumingEnumerable())
+                var x = _sendQueue;
+                foreach (var e in x.GetConsumingEnumerable())
                 {
-                    if (Connected)
-                    {
-                        var n = client.GetStream();
-                        var json = JsonConvert.SerializeObject(e);
-                        var bytes = Encoding.UTF8.GetBytes(json);
-                        var size = new byte[2];
-                        size[0] = (byte)bytes.Length;
-                        size[1] = (byte)(bytes.Length >> 8);
+                    if (!Connected) break;
 
-                        await n.WriteAsync(size, 0, 2);
-                        await n.WriteAsync(bytes, 0, bytes.Length);
-                    }
+                    var n = client.GetStream();
+                    var json = JsonConvert.SerializeObject(e);
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    var size = new byte[2];
+                    size[0] = (byte)bytes.Length;
+                    size[1] = (byte)(bytes.Length >> 8);
+
+                    await n.WriteAsync(size, 0, 2).ConfigureAwait(false);
+                    await n.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
                 }
             }
             catch (Exception ex) { }
@@ -106,7 +101,7 @@ namespace MPAConnector
         {
             if (Connected && !(_sendQueue?.IsAddingCompleted ?? true))
             {
-                _sendQueue.Add(e);
+                _sendQueue?.Add(e);
             }
         }
 
@@ -135,21 +130,6 @@ namespace MPAConnector
                     case "event":
                         var y = JsonConvert.DeserializeObject(s, typeof(Event)) as Event;
                         ProcessEvent(y);
-
-                        //if (y.Com == "MOTORFADER" && y.Cmd == "UPDATED")
-                        //{
-                        //    y.Idx++;
-                        //    y.Cmd = "UPDATE";
-                        //    var ret = JsonConvert.SerializeObject(y);
-                        //    var by = Encoding.UTF8.GetBytes(ret);
-                        //    var size = new byte[2];
-                        //    size[0] = (byte) by.Length;
-                        //    size[1] = (byte) (by.Length >> 8);
-
-                        //    await client.GetStream().WriteAsync(size, 0, 2);
-                        //    await client.GetStream().WriteAsync(by, 0, by.Length);
-                        //}
-
                         return;
                 }
             }
@@ -185,8 +165,10 @@ namespace MPAConnector
             MPATile t = _chains.Values.Select(c => c[e.Nid]).FirstOrDefault(c => c != null);
 
             var success = t?.ProcessEvent(e) ?? false;
+#if DEBUG
             if (!success)
                 Console.WriteLine(JsonConvert.SerializeObject(e));
+#endif
         }
         
         public void Dispose()
