@@ -1,3 +1,4 @@
 /packages
-/MPAConnector/bin
-/MPAConnector/obj
+/**/bin
+/**/obj
+.vs/*

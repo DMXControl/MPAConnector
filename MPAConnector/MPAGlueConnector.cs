@@ -133,8 +133,9 @@ namespace MPAConnector
                         return;
                 }
             }
-            
+#if DEBUG
             Console.WriteLine(s);
+#endif
         }
 
         private void ProcessChainInit(ChainInit i)

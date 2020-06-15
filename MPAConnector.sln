@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPAConnector", "MPAConnector\MPAConnector.csproj", "{508CC473-E780-40AB-B8FE-12850990DB4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPATestProgram", "MPATestProgram\MPATestProgram.csproj", "{2065CB85-31DA-4B9E-BFBC-D02223B32AAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{508CC473-E780-40AB-B8FE-12850990DB4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{508CC473-E780-40AB-B8FE-12850990DB4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{508CC473-E780-40AB-B8FE-12850990DB4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2065CB85-31DA-4B9E-BFBC-D02223B32AAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2065CB85-31DA-4B9E-BFBC-D02223B32AAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2065CB85-31DA-4B9E-BFBC-D02223B32AAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2065CB85-31DA-4B9E-BFBC-D02223B32AAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A5E8AA27-AC97-4315-B368-092ABA2F4561}
 	EndGlobalSection
 EndGlobal
