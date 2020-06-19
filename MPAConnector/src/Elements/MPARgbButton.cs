@@ -33,7 +33,7 @@ namespace MPAConnector.Elements
                     Com = "RGB_LED",
                     Idx = Index,
                     Cmd = "COLOUR",
-                    Val = (value.R << 16) | (value.G << 8) | value.B
+                    Val = (value.B << 16) | (value.G << 8) | value.R
                 };
                 Parent.Parent.Connector.SendEvent(e);
             }
