@@ -21,8 +21,8 @@ namespace MPAConnector
         private readonly ConcurrentDictionary<string, MPAChain> _chains = new ConcurrentDictionary<string, MPAChain>();
         private BlockingCollection<Event> _sendQueue;
 
-        public EventHandler<MPAChainEventArgs> ChainAdded;
-        public EventHandler<MPAChainEventArgs> ChainRemoved;
+        public event EventHandler<MPAChainEventArgs> ChainAdded;
+        public event EventHandler<MPAChainEventArgs> ChainRemoved;
 
         public bool Connected => client?.Connected ?? false;
 
@@ -39,8 +39,8 @@ namespace MPAConnector
 
             _sendQueue = new BlockingCollection<Event>();
 
-            RecieveShit();
-            SendShit();
+            Task.Run(() => RecieveJsonMessages());
+            Task.Run(() => SendJsonMessages());
         }
 
         public void Disconnect()
@@ -52,7 +52,7 @@ namespace MPAConnector
             client = null;
         }
 
-        private async void RecieveShit()
+        private async void RecieveJsonMessages()
         {
             try
             {
@@ -73,11 +73,10 @@ namespace MPAConnector
             catch (Exception e) { }
         }
 
-        private async void SendShit()
+        private async void SendJsonMessages()
         {
             try
             {
-                await Task.Yield();
                 var x = _sendQueue;
                 foreach (var e in x.GetConsumingEnumerable())
                 {
@@ -175,6 +174,9 @@ namespace MPAConnector
         public void Dispose()
         {
             Disconnect();
+
+            ChainAdded = null;
+            ChainRemoved = null;
         }
 
         public IEnumerator<MPAChain> GetEnumerator()

@@ -13,6 +13,8 @@ namespace MPAConnector.Elements
 
         protected AbstractMPAElement(int index, MPATile parent)
         {
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
+
             this.Index = index;
             this.Parent = parent;
         }

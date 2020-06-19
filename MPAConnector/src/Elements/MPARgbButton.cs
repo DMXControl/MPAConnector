@@ -10,7 +10,7 @@ namespace MPAConnector.Elements
 {
     public class MPARgbButton : AbstractMPAElement, IMPARgbButton
     {
-        public event EventHandler PressedChanged;
+        public event EventHandler<ButtonChangedEventArgs> PressedChanged;
 
         private Color _color;
 
@@ -35,7 +35,7 @@ namespace MPAConnector.Elements
                     Cmd = "COLOUR",
                     Val = (value.R << 16) | (value.G << 8) | value.B
                 };
-                Parent?.Parent?.Connector?.SendEvent(e);
+                Parent.Parent.Connector.SendEvent(e);
             }
         }
 
@@ -58,7 +58,7 @@ namespace MPAConnector.Elements
                     break;
             }
             if (ret && old != Pressed)
-                PressedChanged?.Invoke(this, EventArgs.Empty);
+                PressedChanged?.Invoke(this, new ButtonChangedEventArgs(Pressed));
             return ret;
         }
     }

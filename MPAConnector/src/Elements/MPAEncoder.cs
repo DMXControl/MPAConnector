@@ -8,10 +8,10 @@ namespace MPAConnector.Elements
 {
     public class MPAEncoder : AbstractMPAElement, IMPAEncoder
     {
-        public event EventHandler PressedChanged;
-        public event EventHandler TouchedChanged;
-        public event EventHandler TurnedLeft;
-        public event EventHandler TurnedRight;
+        public event EventHandler<ButtonChangedEventArgs> PressedChanged;
+        public event EventHandler<ButtonChangedEventArgs> TouchedChanged;
+        public event EventHandler<EventArgs> TurnedLeft;
+        public event EventHandler<EventArgs> TurnedRight;
 
         public MPAEncoder(int index, int touchIndex, MPATile parent) : base(index, parent)
         {
@@ -68,10 +68,10 @@ namespace MPAConnector.Elements
                     if (idx == TouchIndex)
                     {
                         if (old != Touched)
-                            TouchedChanged?.Invoke(this, EventArgs.Empty);
+                            TouchedChanged?.Invoke(this, new ButtonChangedEventArgs(Touched));
                     }
                     else if (old != Pressed)
-                        PressedChanged?.Invoke(this, EventArgs.Empty);
+                        PressedChanged?.Invoke(this, new ButtonChangedEventArgs(Pressed));
                 }
 
                 return ret;

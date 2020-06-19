@@ -9,8 +9,8 @@ namespace MPAConnector.Elements
 {
     public class MPAMotorfader : AbstractMPAElement, IMPAMotorfader
     {
-        public event EventHandler ValueChanged;
-        public event EventHandler TouchedChanged;
+        public event EventHandler<FaderChangedEventArgs> ValueChanged;
+        public event EventHandler<ButtonChangedEventArgs> TouchedChanged;
 
         private ushort _value;
 
@@ -28,7 +28,7 @@ namespace MPAConnector.Elements
                 if (_value != value)
                 {
                     _value = value;
-                    ValueChanged?.Invoke(this, EventArgs.Empty);
+                    ValueChanged?.Invoke(this, new FaderChangedEventArgs(value));
 
                     var e = new Event()
                     {
@@ -39,7 +39,7 @@ namespace MPAConnector.Elements
                         Cmd = "UPDATE",
                         Val = value
                     };
-                    Parent?.Parent?.Connector?.SendEvent(e);
+                    Parent.Parent.Connector.SendEvent(e);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace MPAConnector.Elements
                     if (_value != (ushort) val)
                     {
                         _value = (ushort) val;
-                        ValueChanged?.Invoke(this, EventArgs.Empty);
+                        ValueChanged?.Invoke(this, new FaderChangedEventArgs(_value));
                     }
                     break;
 
@@ -67,7 +67,7 @@ namespace MPAConnector.Elements
                     if (!Touched)
                     {
                         Touched = true;
-                        TouchedChanged?.Invoke(this, EventArgs.Empty);
+                        TouchedChanged?.Invoke(this, new ButtonChangedEventArgs(Touched));
                     }
                     goto case "UPDATED";
 
@@ -75,7 +75,7 @@ namespace MPAConnector.Elements
                     if (Touched)
                     {
                         Touched = false;
-                        TouchedChanged?.Invoke(this, EventArgs.Empty);
+                        TouchedChanged?.Invoke(this, new ButtonChangedEventArgs(Touched));
                     }
                     goto case "UPDATED";
             }

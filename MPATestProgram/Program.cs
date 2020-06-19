@@ -115,7 +115,7 @@ namespace MPAConnector
             };
         }
 
-        private static async void MpaRgbButton_PressedChanged(object sender, EventArgs e)
+        private static async void MpaRgbButton_PressedChanged(object sender, ButtonChangedEventArgs e)
         {
             IMPARgbButton b = sender as IMPARgbButton;
             if (b == null) return;

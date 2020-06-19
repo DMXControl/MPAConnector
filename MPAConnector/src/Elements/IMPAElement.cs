@@ -17,8 +17,8 @@ namespace MPAConnector.Elements
 
     public interface IMPAMotorfader : IMPAElement
     {
-        event EventHandler ValueChanged;
-        event EventHandler TouchedChanged;
+        event EventHandler<FaderChangedEventArgs> ValueChanged;
+        event EventHandler<ButtonChangedEventArgs> TouchedChanged;
 
         bool Touched { get; }
 
@@ -27,9 +27,9 @@ namespace MPAConnector.Elements
 
     public interface IMPAEncoder : IMPAButton
     {
-        event EventHandler TouchedChanged;
-        event EventHandler TurnedLeft;
-        event EventHandler TurnedRight;
+        event EventHandler<ButtonChangedEventArgs> TouchedChanged;
+        event EventHandler<EventArgs> TurnedLeft;
+        event EventHandler<EventArgs> TurnedRight;
 
 
         bool Touched { get; }
@@ -38,7 +38,7 @@ namespace MPAConnector.Elements
 
     public interface IMPAButton : IMPAElement
     {
-        event EventHandler PressedChanged;
+        event EventHandler<ButtonChangedEventArgs> PressedChanged;
 
         bool Pressed { get; }
     }
@@ -46,5 +46,25 @@ namespace MPAConnector.Elements
     public interface IMPARgbButton : IMPAButton
     {
         Color ButtonColor { get; set; }
+    }
+
+    public class ButtonChangedEventArgs : EventArgs
+    {
+        public readonly bool Value;
+
+        public ButtonChangedEventArgs(bool value)
+        {
+            this.Value = value;
+        }
+    }
+
+    public class FaderChangedEventArgs : EventArgs
+    {
+        public readonly ushort Value;
+
+        public FaderChangedEventArgs(ushort value)
+        {
+            this.Value = value;
+        }
     }
 }

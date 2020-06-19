@@ -14,6 +14,8 @@ namespace MPAConnector
 
         public MPAChain(string chainId, MPAGlueConnector connector)
         {
+            if (connector == null) throw new ArgumentNullException(nameof(connector));
+
             this.ChainID = chainId;
             this.Connector = connector;
         }

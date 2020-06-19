@@ -15,6 +15,8 @@ namespace MPAConnector
 
         public MPATile(string type, string pid, int nid, MPAChain parent)
         {
+            if (parent == null) throw new ArgumentNullException(nameof(parent));
+
             this.Type = type;
             this.TileID = pid;
             this.ShortID = nid;
