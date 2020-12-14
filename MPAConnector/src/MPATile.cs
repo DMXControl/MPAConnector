@@ -9,6 +9,13 @@ using MPAConnector.json;
 
 namespace MPAConnector
 {
+    public enum ETileType
+    {
+        Button,
+        Encoder,
+        Fader
+    }
+
     public class MPATile : IEnumerable<IMPAElement>
     {
         private readonly Dictionary<int, IMPAElement> _elements = new Dictionary<int, IMPAElement>();
@@ -27,6 +34,8 @@ namespace MPAConnector
 
         public string Type { get; }
 
+        public ETileType TileType { get; private set; }
+
         public string TileID { get; }
 
         public int ShortID { get; }
@@ -39,22 +48,27 @@ namespace MPAConnector
             switch (Type)
             {
                 case "UIM_12ENC_12BUT":
+                    TileType = ETileType.Encoder;
                     for (int i = 0; i < 12; i++)
                         _elements.Add(i, new MPAEncoder(i, i + 12, this));
                     break;
                 case "UIM_8ENC_8BUT":
+                    TileType = ETileType.Encoder;
                     for (int i = 0; i < 8; i++)
                         _elements.Add(i, new MPAEncoder(i, i + 8, this));
                     break;
                 case "UIM_12RGB_12BUT":
+                    TileType = ETileType.Button;
                     for (int i = 0; i < 12; i++)
                         _elements.Add(i, new MPARgbButton(i, this));
                     break;
                 case "UIM_8RGB_8BUT":
+                    TileType = ETileType.Button;
                     for (int i = 0; i < 8; i++)
                         _elements.Add(i, new MPARgbButton(i, this));
                     break;
                 case "UIM_4FAD":
+                    TileType = ETileType.Fader;
                     for (int i = 0; i < 4; i++)
                         _elements.Add(i, new MPAMotorfader(i, this));
                     break;

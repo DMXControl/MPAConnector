@@ -30,6 +30,8 @@ namespace MPAConnector
 
         public int RemotePort { get; set; } = 8192;
 
+        public Action<string, bool> MessageDebugLogCallback { get; set; }
+
         public async Task connect()
         {
             Disconnect();
@@ -111,33 +113,33 @@ namespace MPAConnector
             JObject result = JObject.Parse(s);
 
             JToken msg_type;
+            bool success = false;
             if (result.TryGetValue("msg_type", StringComparison.InvariantCultureIgnoreCase, out msg_type))
             {
                 switch (msg_type.Value<string>().ToLowerInvariant())
                 {
                     case "chain-init":
                         var x = JsonConvert.DeserializeObject(s, typeof(ChainInit)) as ChainInit;
-                        ProcessChainInit(x);
-                        return;
+                        success = ProcessChainInit(x);
+                        break;
 
                     case "chain-exit":
                         JToken chainId;
                         if (result.TryGetValue("chain_id", StringComparison.InvariantCultureIgnoreCase, out chainId))
-                            ProcessChainExit(chainId.Value<string>());
-                        return;
+                            success = ProcessChainExit(chainId.Value<string>());
+                        break;
 
                     case "event":
                         var y = JsonConvert.DeserializeObject(s, typeof(Event)) as Event;
-                        ProcessEvent(y);
-                        return;
+                        success = ProcessEvent(y);
+                        break;
                 }
             }
-#if DEBUG
-            Console.WriteLine(s);
-#endif
+
+            MessageDebugLogCallback?.Invoke(s, success);
         }
 
-        private void ProcessChainInit(ChainInit i)
+        private bool ProcessChainInit(ChainInit i)
         {
             MPAChain nc = new MPAChain(i.ChainID, this);
             foreach (var bi in i.BoardInfos)
@@ -149,26 +151,26 @@ namespace MPAConnector
             _chains[i.ChainID] = nc;
 
             ChainAdded?.Invoke(this, new MPAChainEventArgs(nc));
+            return true;
         }
 
-        private void ProcessChainExit(string chainId)
+        private bool ProcessChainExit(string chainId)
         {
             MPAChain c = null;
             if (_chains.TryRemove(chainId, out c))
             {
                 ChainRemoved?.Invoke(this, new MPAChainEventArgs(c));
             }
+            return true;
         }
 
-        private void ProcessEvent(Event e)
+        private bool ProcessEvent(Event e)
         {
             MPATile t = _chains.Values.Select(c => c[e.Nid]).FirstOrDefault(c => c != null);
 
             var success = t?.ProcessEvent(e) ?? false;
-#if DEBUG
-            if (!success)
-                Console.WriteLine(JsonConvert.SerializeObject(e));
-#endif
+
+            return success;
         }
         
         public void Dispose()

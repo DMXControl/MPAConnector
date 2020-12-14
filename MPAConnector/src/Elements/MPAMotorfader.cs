@@ -69,7 +69,7 @@ namespace MPAConnector.Elements
                         Touched = true;
                         TouchedChanged?.Invoke(this, new ButtonChangedEventArgs(Touched));
                     }
-                    goto case "UPDATED";
+                    break;
 
                 case "RELEASED":
                     if (Touched)
@@ -77,7 +77,7 @@ namespace MPAConnector.Elements
                         Touched = false;
                         TouchedChanged?.Invoke(this, new ButtonChangedEventArgs(Touched));
                     }
-                    goto case "UPDATED";
+                    break;
             }
 
             return ret;
