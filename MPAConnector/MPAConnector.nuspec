@@ -3,6 +3,9 @@
   <metadata>
     <id>DMXControlProjects.MPAConnector</id>
     <version>$version$</version>
+	<title>$title$</title>
+	<projectUrl>https://dmxcontrol-projects.org</projectUrl>
+	<copyright>Copyright 2020</copyright>
     <description>Connection Library for MakeProAudio Glue System</description>
     <authors>DMXControl Projects e.V.</authors>
 	<dependencies>
